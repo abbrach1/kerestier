@@ -49,13 +49,75 @@ for (const radio of form.method) {
   });
 }
 
+// Firebase is loaded on first use so the form itself always works, even if it can't start.
+let firebase;
+function loadFirebase() {
+  firebase ||= Promise.all([import('firebase/firestore'), import('firebase/storage'), import('./firebase.js')])
+    .then(([firestore, storage, app]) => ({ ...firestore, ...storage, db: app.db, storage: app.storage }));
+  return firebase;
+}
+
+// One id per visit, so the passport photo can upload as soon as it's picked,
+// before the traveler presses Submit.
+const ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const submissionId = Array.from(crypto.getRandomValues(new Uint8Array(20)), (b) => ID_CHARS[b % 62]).join('');
+
+let upload = null; // { file, name, path, percent, promise, failed }
+
+function startUpload(file) {
+  const { contentType, ext } = fileInfo(file);
+  const name = `passport-${Date.now()}.${ext}`;
+  const current = { file, name, path: `passports/${submissionId}/${name}`, percent: 0 };
+  upload = current;
+  showUploadStatus('progress', 0);
+  current.promise = loadFirebase().then(({ ref, uploadBytesResumable, storage }) => new Promise((resolve, reject) => {
+    const task = uploadBytesResumable(ref(storage, current.path), file, { contentType });
+    task.on('state_changed', (snap) => {
+      current.percent = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+      if (upload === current) showUploadStatus('progress', current.percent);
+    }, reject, resolve);
+  })).then(() => {
+    if (upload === current) showUploadStatus('done');
+  }, (err) => {
+    console.error(err);
+    current.failed = true;
+    if (upload === current) showUploadStatus('failed');
+    throw err;
+  });
+  current.promise.catch(() => {}); // handled on submit
+}
+
+function showUploadStatus(state, percent = 0) {
+  let box = preview.querySelector('.upload-status');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'upload-status';
+    box.innerHTML = '<div class="bar"><span></span></div><p></p>';
+    preview.append(box);
+  }
+  box.dataset.state = state;
+  box.querySelector('.bar span').style.width = (state === 'done' ? 100 : percent) + '%';
+  const msg = box.querySelector('p');
+  if (state === 'progress') msg.textContent = `Uploading… ${percent}%. You can keep filling out the form.`;
+  if (state === 'done') msg.textContent = 'Uploaded.';
+  if (state === 'failed') {
+    msg.innerHTML = 'Upload failed. Check your connection and <button type="button" class="link" id="retry-upload">try again</button>.';
+    msg.querySelector('#retry-upload').addEventListener('click', () => startUpload(upload.file));
+  }
+}
+
 form.passportFile.addEventListener('change', () => {
   const file = form.passportFile.files[0];
+  upload = null;
   preview.innerHTML = '';
   preview.hidden = !file;
   if (!file) return;
   if (file.size > MAX_FILE_BYTES) {
     preview.innerHTML = '<p>That file is over 10 MB. Try a smaller photo or a screenshot of it.</p>';
+    return;
+  }
+  if (!/^image\/|^application\/pdf$/.test(fileInfo(file).contentType)) {
+    preview.innerHTML = '<p>That file type isn\'t supported. Please choose a photo or a PDF.</p>';
     return;
   }
   if (file.type.startsWith('image/') && !/heic|heif/i.test(file.type)) {
@@ -68,6 +130,7 @@ form.passportFile.addEventListener('change', () => {
     p.textContent = `Attached: ${file.name}`;
     preview.append(p);
   }
+  startUpload(file);
 });
 
 // Date of birth as YYYY-MM-DD, or '' if it isn't a real past date.
@@ -86,8 +149,7 @@ function fileInfo(file) {
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   const byExt = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', heic: 'image/heic', heif: 'image/heif', webp: 'image/webp', pdf: 'application/pdf' };
   const contentType = file.type || byExt[ext] || '';
-  const safeExt = /^[a-z0-9]{2,5}$/.test(ext) ? ext : 'jpg';
-  return { contentType, name: `passport.${safeExt}` };
+  return { contentType, ext: /^[a-z0-9]{2,5}$/.test(ext) ? ext : 'jpg' };
 }
 
 function validate() {
@@ -140,26 +202,24 @@ form.addEventListener('submit', async (e) => {
   submitBtn.disabled = true;
   const label = submitBtn.textContent;
   try {
-    // Loaded on submit so the form itself always works, even if Firebase can't start.
-    const [{ collection, doc, setDoc, serverTimestamp }, { ref, uploadBytesResumable }, { db, storage }] = await Promise.all([
-      import('firebase/firestore'), import('firebase/storage'), import('./firebase.js'),
-    ]);
-    const docRef = doc(collection(db, 'tripRegistrations'));
+    const { doc, setDoc, serverTimestamp, db } = await loadFirebase();
+    const docRef = doc(db, 'tripRegistrations', submissionId);
     const manual = method() === 'manual';
     let path = '';
     let name = '';
 
     if (!manual) {
       const file = form.passportFile.files[0];
-      const info = fileInfo(file);
-      name = info.name;
-      path = `passports/${docRef.id}/${name}`;
-      await new Promise((resolve, reject) => {
-        const task = uploadBytesResumable(ref(storage, path), file, { contentType: info.contentType });
-        task.on('state_changed',
-          (s) => { submitBtn.textContent = `Uploading… ${Math.round((s.bytesTransferred / s.totalBytes) * 100)}%`; },
-          reject, resolve);
-      });
+      if (!upload || upload.file !== file || upload.failed) startUpload(file);
+      const current = upload;
+      // Usually finished already; if not, show progress on the button while it completes.
+      const tick = setInterval(() => { submitBtn.textContent = `Finishing upload… ${current.percent}%`; }, 200);
+      try {
+        await current.promise;
+      } finally {
+        clearInterval(tick);
+      }
+      ({ name, path } = current);
     }
 
     submitBtn.textContent = 'Saving…';
@@ -185,7 +245,7 @@ form.addEventListener('submit', async (e) => {
     fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: docRef.id }),
+      body: JSON.stringify({ id: submissionId }),
       keepalive: true,
     }).catch(() => {});
 
