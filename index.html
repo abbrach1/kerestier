@@ -67,24 +67,34 @@
             January 17, 2027, so it can't expire before <strong>July 17, 2027</strong>.
             If it does, start your renewal now. Renewals can take weeks.
           </div>
-          <label>Nationality (country that issued the passport)
-            <select name="nationality" required></select>
-          </label>
-          <div class="row">
-            <label>Passport number
-              <input name="passportNumber" autocomplete="off" spellcheck="false" required />
-            </label>
-            <label>Expiration date
-              <input name="passportExpiry" type="date" required />
-            </label>
+          <p class="choice-label">How would you like to send your passport details?</p>
+          <div class="choice" role="radiogroup">
+            <label><input type="radio" name="method" value="photo" checked /> <span>Upload a photo</span></label>
+            <label><input type="radio" name="method" value="manual" /> <span>Type them in</span></label>
           </div>
-          <p class="field-msg" id="expiry-msg" hidden></p>
 
-          <label class="upload">Photo of passport photo page
-            <span class="hint">A clear, flat photo or scan of the page with your picture. JPG, PNG, HEIC or PDF, up to 10 MB.</span>
-            <input name="passportFile" type="file" accept="image/*,application/pdf" required />
-          </label>
-          <div class="preview" id="preview" hidden></div>
+          <div class="panel" data-method="photo">
+            <label class="upload">Photo of passport photo page
+              <span class="hint">A clear, flat photo or scan of the page with your picture, with every corner in frame. JPG, PNG, HEIC or PDF, up to 10 MB.</span>
+              <input name="passportFile" type="file" accept="image/*,application/pdf" />
+            </label>
+            <div class="preview" id="preview" hidden></div>
+          </div>
+
+          <div class="panel" data-method="manual" hidden>
+            <label>Nationality (country that issued the passport)
+              <select name="nationality"></select>
+            </label>
+            <div class="row">
+              <label>Passport number
+                <input name="passportNumber" autocomplete="off" spellcheck="false" />
+              </label>
+              <label>Expiration date
+                <input name="passportExpiry" type="date" />
+              </label>
+            </div>
+            <p class="field-msg" id="expiry-msg" hidden></p>
+          </div>
         </fieldset>
 
         <fieldset>

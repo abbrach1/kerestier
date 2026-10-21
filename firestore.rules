@@ -1,12 +1,26 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Either a passport photo was uploaded, or the details were typed in.
+    function validPhoto(d, id) {
+      return d.method == 'photo'
+          && d.passportFileName is string
+          && d.passportFilePath == 'passports/' + id + '/' + d.passportFileName;
+    }
+    function validManual(d) {
+      return d.method == 'manual'
+          && d.nationality is string && d.nationality.size() > 0
+          && d.passportNumber is string
+          && d.passportNumber.size() >= 5 && d.passportNumber.size() <= 20
+          && d.passportExpiry is string && d.passportExpiry.size() == 10;
+    }
+
     // Public form can only create a submission. Nobody can read, list, edit or
     // delete from the browser. View submissions in the Firebase console.
     match /tripRegistrations/{id} {
       allow read, update, delete: if false;
       allow create: if request.resource.data.keys().hasOnly([
-                         'firstName', 'middleName', 'lastName', 'email', 'phone',
+                         'firstName', 'middleName', 'lastName', 'email', 'phone', 'method',
                          'nationality', 'passportNumber', 'passportExpiry',
                          'matmidNumber', 'passportFilePath', 'passportFileName',
                          'trip', 'createdAt'])
@@ -14,12 +28,8 @@ service cloud.firestore {
                     && request.resource.data.firstName.size() > 0
                     && request.resource.data.lastName is string
                     && request.resource.data.lastName.size() > 0
-                    && request.resource.data.passportNumber is string
-                    && request.resource.data.passportNumber.size() >= 5
-                    && request.resource.data.passportNumber.size() <= 20
-                    && request.resource.data.nationality is string
-                    && request.resource.data.passportFilePath == 'passports/' + id + '/' + request.resource.data.passportFileName
-                    && request.resource.data.createdAt == request.time;
+                    && request.resource.data.createdAt == request.time
+                    && (validPhoto(request.resource.data, id) || validManual(request.resource.data));
     }
     match /{document=**} {
       allow read, write: if false;

@@ -42,6 +42,14 @@ function checkExpiry() {
 }
 form.passportExpiry.addEventListener('change', checkExpiry);
 
+function method() { return form.method.value; }
+for (const radio of form.method) {
+  radio.addEventListener('change', () => {
+    for (const panel of form.querySelectorAll('.panel')) panel.hidden = panel.dataset.method !== method();
+    formError.hidden = true;
+  });
+}
+
 form.passportFile.addEventListener('change', () => {
   const file = form.passportFile.files[0];
   preview.innerHTML = '';
@@ -76,22 +84,24 @@ function validate() {
   const problems = [];
   const mark = (el, bad) => el.classList.toggle('invalid', bad);
 
-  for (const el of [f.firstName, f.lastName, f.email, f.phone, f.nationality, f.passportNumber, f.passportExpiry]) {
-    mark(el, !el.value.trim());
-  }
+  const manual = method() === 'manual';
+  for (const el of [f.firstName, f.lastName, f.email, f.phone]) mark(el, !el.value.trim());
+  for (const el of [f.nationality, f.passportNumber, f.passportExpiry]) mark(el, manual && !el.value.trim());
   if (!f.firstName.value.trim() || !f.lastName.value.trim()) problems.push('your name as it appears on your passport');
   if (!/^\S+@\S+\.\S+$/.test(f.email.value.trim())) { problems.push('a valid email'); mark(f.email, true); }
   if (f.phone.value.replace(/\D/g, '').length < 7) { problems.push('a phone number'); mark(f.phone, true); }
-  if (!f.nationality.value) problems.push('your nationality');
 
-  const pn = f.passportNumber.value.replace(/\s/g, '');
-  if (!/^[A-Za-z0-9]{5,20}$/.test(pn)) { problems.push('a valid passport number (letters and numbers only)'); mark(f.passportNumber, true); }
-  if (!f.passportExpiry.value) problems.push('your passport expiration date');
-
-  const file = f.passportFile.files[0];
-  if (!file) problems.push('a photo of your passport');
-  else if (file.size > MAX_FILE_BYTES) problems.push('a passport photo under 10 MB');
-  else if (!/^image\/|^application\/pdf$/.test(fileInfo(file).contentType)) problems.push('an image or PDF of your passport');
+  if (manual) {
+    if (!f.nationality.value) problems.push('your nationality');
+    const pn = f.passportNumber.value.replace(/\s/g, '');
+    if (!/^[A-Za-z0-9]{5,20}$/.test(pn)) { problems.push('a valid passport number (letters and numbers only)'); mark(f.passportNumber, true); }
+    if (!f.passportExpiry.value) problems.push('your passport expiration date');
+  } else {
+    const file = f.passportFile.files[0];
+    if (!file) problems.push('a photo of your passport (or switch to "Type them in")');
+    else if (file.size > MAX_FILE_BYTES) problems.push('a passport photo under 10 MB');
+    else if (!/^image\/|^application\/pdf$/.test(fileInfo(file).contentType)) problems.push('an image or PDF of your passport');
+  }
 
   const matmid = f.matmidNumber.value.replace(/\s/g, '');
   if (matmid && !/^\d{5,12}$/.test(matmid)) { problems.push('a Matmid number with digits only (or leave it blank)'); mark(f.matmidNumber, true); }
@@ -104,7 +114,7 @@ function validate() {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   formError.hidden = true;
-  checkExpiry();
+  if (method() === 'manual') checkExpiry();
 
   const problems = validate();
   if (problems.length) {
@@ -117,16 +127,22 @@ form.addEventListener('submit', async (e) => {
   const label = submitBtn.textContent;
   try {
     const docRef = doc(collection(db, 'tripRegistrations'));
-    const file = form.passportFile.files[0];
-    const { contentType, name } = fileInfo(file);
-    const path = `passports/${docRef.id}/${name}`;
+    const manual = method() === 'manual';
+    let path = '';
+    let name = '';
 
-    await new Promise((resolve, reject) => {
-      const task = uploadBytesResumable(ref(storage, path), file, { contentType });
-      task.on('state_changed',
-        (s) => { submitBtn.textContent = `Uploading… ${Math.round((s.bytesTransferred / s.totalBytes) * 100)}%`; },
-        reject, resolve);
-    });
+    if (!manual) {
+      const file = form.passportFile.files[0];
+      const info = fileInfo(file);
+      name = info.name;
+      path = `passports/${docRef.id}/${name}`;
+      await new Promise((resolve, reject) => {
+        const task = uploadBytesResumable(ref(storage, path), file, { contentType: info.contentType });
+        task.on('state_changed',
+          (s) => { submitBtn.textContent = `Uploading… ${Math.round((s.bytesTransferred / s.totalBytes) * 100)}%`; },
+          reject, resolve);
+      });
+    }
 
     submitBtn.textContent = 'Saving…';
     await setDoc(docRef, {
@@ -135,9 +151,10 @@ form.addEventListener('submit', async (e) => {
       lastName: form.lastName.value.trim(),
       email: form.email.value.trim().toLowerCase(),
       phone: form.phone.value.trim(),
-      nationality: form.nationality.value,
-      passportNumber: form.passportNumber.value.replace(/\s/g, '').toUpperCase(),
-      passportExpiry: form.passportExpiry.value,
+      method: manual ? 'manual' : 'photo',
+      nationality: manual ? form.nationality.value : '',
+      passportNumber: manual ? form.passportNumber.value.replace(/\s/g, '').toUpperCase() : '',
+      passportExpiry: manual ? form.passportExpiry.value : '',
       matmidNumber: form.matmidNumber.value.replace(/\s/g, ''),
       passportFilePath: path,
       passportFileName: name,
