@@ -12,8 +12,12 @@ const app = $('app');
 let rows = [];
 let unsubscribe = null;
 
-$('sign-in').addEventListener('click', () => {
-  signInWithPopup(auth, new GoogleAuthProvider()).catch((err) => {
+$('sign-in').addEventListener('click', async () => {
+  // Always show Google's account chooser, so a wrong account can be swapped out.
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  if (auth.currentUser) await signOut(auth);
+  signInWithPopup(auth, provider).catch((err) => {
     if (err.code !== 'auth/popup-closed-by-user') $('gate-msg').textContent = "Couldn't sign in. Try again.";
   });
 });
@@ -25,6 +29,8 @@ onAuthStateChanged(auth, (user) => {
   if (!user) {
     app.hidden = true;
     gate.hidden = false;
+    $('gate-msg').textContent = "Organizers only. Sign in with the Google account that's been given access.";
+    $('sign-in').textContent = 'Sign in with Google';
     return;
   }
   $('who-email').textContent = user.email;
@@ -39,9 +45,15 @@ onAuthStateChanged(auth, (user) => {
     console.error(err);
     app.hidden = true;
     gate.hidden = false;
-    $('gate-msg').textContent = err.code === 'permission-denied'
-      ? `${user.email} doesn't have access. Ask the trip organizer to add you.`
-      : "Couldn't load registrations. Refresh to try again.";
+    $('sign-in').textContent = 'Use a different account';
+    if (err.code === 'permission-denied') {
+      $('gate-msg').innerHTML = `<strong>${esc(user.email)}</strong> doesn't have access yet.
+        To add it, go to Firebase → Firestore → <code>admins</code> collection and create a document
+        whose <em>Document ID</em> is exactly <code>${esc(user.email.toLowerCase())}</code>.
+        Then refresh this page.`;
+    } else {
+      $('gate-msg').textContent = "Couldn't load registrations. Refresh to try again.";
+    }
   });
 });
 
