@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Upload only: passport scans can't be read, overwritten or deleted from the browser.
+    match /passports/{submissionId}/{fileName} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.size < 10 * 1024 * 1024
+                    && (request.resource.contentType.matches('image/.*')
+                        || request.resource.contentType == 'application/pdf');
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

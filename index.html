@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trip Registration · Yeshiva Toras Chaim</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Frank+Ruhl+Libre:wght@500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="wrap masthead__inner">
+        <a class="brand" href="https://ytchaim.com">
+          <img src="/logo.png" onerror="this.onerror=null;this.src='/logo.svg'" alt="" width="64" height="64" />
+          <span class="brand__text">
+            <span class="brand__name">Yeshiva Toras Chaim</span>
+            <span class="brand__heb" lang="he" dir="rtl">תורת חיים</span>
+          </span>
+        </a>
+        <span class="masthead__note">Winter Trip &middot; January 2027</span>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="intro">
+        <h1>Trip registration</h1>
+        <p>
+          We need these details to book flights. Please fill everything in
+          <strong>exactly as it appears on your passport</strong>, including middle names.
+          Questions? Reply to the email that sent you here.
+        </p>
+      </div>
+
+      <form id="reg" novalidate>
+        <fieldset>
+          <legend>Traveler</legend>
+          <p class="hint">Use the spelling on your passport, not a nickname or Hebrew name.</p>
+          <div class="row">
+            <label>Given name(s)
+              <input name="firstName" autocomplete="given-name" required />
+            </label>
+            <label>Middle name <span class="opt">optional</span>
+              <input name="middleName" autocomplete="additional-name" />
+            </label>
+          </div>
+          <label>Surname
+            <input name="lastName" autocomplete="family-name" required />
+          </label>
+          <div class="row">
+            <label>Email
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+            <label>Cell phone
+              <input name="phone" type="tel" autocomplete="tel" required />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Passport</legend>
+          <div class="notice" role="note">
+            <strong>Check your expiration date.</strong>
+            Your passport must be valid for at least six months after we leave on
+            January 17, 2027, so it can't expire before <strong>July 17, 2027</strong>.
+            If it does, start your renewal now. Renewals can take weeks.
+          </div>
+          <label>Nationality (country that issued the passport)
+            <select name="nationality" required></select>
+          </label>
+          <div class="row">
+            <label>Passport number
+              <input name="passportNumber" autocomplete="off" spellcheck="false" required />
+            </label>
+            <label>Expiration date
+              <input name="passportExpiry" type="date" required />
+            </label>
+          </div>
+          <p class="field-msg" id="expiry-msg" hidden></p>
+
+          <label class="upload">Photo of passport photo page
+            <span class="hint">A clear, flat photo or scan of the page with your picture. JPG, PNG, HEIC or PDF, up to 10 MB.</span>
+            <input name="passportFile" type="file" accept="image/*,application/pdf" required />
+          </label>
+          <div class="preview" id="preview" hidden></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>El Al Matmid</legend>
+          <label>Matmid number <span class="opt">if you have one</span>
+            <input name="matmidNumber" inputmode="numeric" autocomplete="off" />
+          </label>
+          <p class="hint">We'll add it to your booking so you earn points.</p>
+        </fieldset>
+
+        <label class="check">
+          <input type="checkbox" name="confirm" required />
+          <span>I've checked that the details above match my passport.</span>
+        </label>
+
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <button type="submit" id="submit">Submit registration</button>
+      </form>
+
+      <section class="done" id="done" hidden>
+        <h1>Thanks, you're registered.</h1>
+        <p>We've got your details. If anything changes, like a new passport, let us know before booking.</p>
+      </section>
+    </main>
+
+    <footer class="wrap footer">
+      <p>Your passport details are only used to book travel for this trip.</p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

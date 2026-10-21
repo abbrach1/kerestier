@@ -1,0 +1,123 @@
+/* Colors taken from the YTC seal. */
+:root {
+  --brand: #8b7765;
+  --brand-dark: #6e5d4e;
+  --ink: #2f2822;
+  --muted: #776b60;
+  --paper: #f6f2eb;
+  --card: #fffdf9;
+  --line: #e1d8ca;
+  --warn-bg: #f7ecd9;
+  --warn-line: #c39553;
+  --error: #9e3a28;
+  --ok: #4f6b45;
+  --serif: 'Libre Caslon Text', Georgia, serif;
+  --sans: 'Public Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+.masthead { background: var(--card); border-bottom: 1px solid var(--line); }
+.masthead__inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding-top: 14px; padding-bottom: 14px;
+}
+.brand { display: flex; align-items: center; gap: 14px; color: var(--ink); text-decoration: none; }
+.brand img { width: 64px; height: 64px; object-fit: contain; }
+.brand__text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand__name { font-family: var(--serif); font-size: 19px; letter-spacing: .02em; }
+.brand__heb { font-family: 'Frank Ruhl Libre', serif; color: var(--brand); font-size: 15px; text-align: left; }
+.masthead__note { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+.intro { padding: 40px 0 8px; }
+h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; margin: 0 0 10px; }
+.intro p { margin: 0; color: var(--muted); max-width: 56ch; }
+.intro strong { color: var(--ink); font-weight: 600; }
+
+form { margin: 28px 0 0; }
+
+fieldset {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 4px;
+  margin: 0 0 20px;
+  padding: 22px 24px 8px;
+}
+legend {
+  font-family: var(--serif);
+  font-size: 20px;
+  padding: 0 8px;
+  margin-left: -8px;
+}
+
+label { display: block; margin: 0 0 18px; font-weight: 500; font-size: 15px; }
+.opt { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 4px; }
+.hint { display: block; font-weight: 400; color: var(--muted); font-size: 14px; margin: -4px 0 16px; }
+label .hint { margin: 2px 0 8px; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: 1fr; }
+  .masthead__note { display: none; }
+  h1 { font-size: 28px; }
+  fieldset { padding: 18px 16px 4px; }
+}
+
+input, select {
+  display: block; width: 100%; margin-top: 6px;
+  font: inherit; font-weight: 400; color: var(--ink);
+  background: #fff;
+  border: 1px solid #cfc4b4; border-radius: 3px;
+  padding: 10px 12px; min-height: 44px;
+}
+input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
+input[name="passportNumber"] { text-transform: uppercase; letter-spacing: .06em; }
+input[type="file"] { padding: 8px; background: var(--paper); }
+input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; margin: 2px 0 0; accent-color: var(--brand-dark); flex: none; }
+.invalid { border-color: var(--error); }
+
+.notice {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn-line);
+  padding: 12px 14px;
+  margin: 0 0 20px;
+  font-size: 15px;
+}
+.notice strong:first-child { display: block; margin-bottom: 2px; }
+
+.field-msg { margin: -10px 0 18px; font-size: 14px; }
+.field-msg.is-bad { color: var(--error); }
+.field-msg.is-good { color: var(--ok); }
+
+.preview { margin: -6px 0 18px; }
+.preview img { max-width: 100%; max-height: 260px; border: 1px solid var(--line); border-radius: 3px; display: block; }
+.preview p { margin: 0; font-size: 14px; color: var(--muted); }
+
+.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; margin: 4px 0 20px; }
+
+.form-error { color: var(--error); margin: 0 0 14px; font-size: 15px; }
+
+button {
+  font: inherit; font-weight: 600;
+  background: var(--brand-dark); color: #fff;
+  border: 0; border-radius: 3px;
+  padding: 13px 26px; min-height: 48px;
+  cursor: pointer;
+}
+button:hover { background: #5c4d40; }
+button:disabled { opacity: .6; cursor: wait; }
+
+.done { padding: 48px 0 24px; }
+.done p { color: var(--muted); max-width: 52ch; }
+
+.footer { padding-top: 32px; padding-bottom: 40px; font-size: 13px; color: var(--muted); }
