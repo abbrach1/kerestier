@@ -136,6 +136,7 @@ async function openDetails(id) {
     ['Date of birth', r.birthDate ? fmtDate(r.birthDate) : ''],
     ['Nationality', r.nationality],
     ['Passport #', r.passportNumber],
+    ['Issued', r.passportIssued ? fmtDate(r.passportIssued) : ''],
     ['Expires', r.passportExpiry ? fmtDate(r.passportExpiry) + (expiresTooSoon(r) ? ' (too soon, must be valid through Jul 17, 2027)' : '') : ''],
     ['El Al Matmid #', r.matmidNumber],
     ['Submitted', fmtTime(r.createdAt)],
@@ -190,7 +191,7 @@ $('export').addEventListener('click', () => {
     ['First name', 'firstName'], ['Middle name', 'middleName'], ['Last name', 'lastName'],
     ['Date of birth', 'birthDate'],
     ['Nationality', 'nationality'],
-    ['Passport #', 'passportNumber'], ['Passport expiry', 'passportExpiry'],
+    ['Passport #', 'passportNumber'], ['Passport issued', 'passportIssued'], ['Passport expiry', 'passportExpiry'],
     ['El Al Matmid #', 'matmidNumber'], ['Sent as', 'method'],
     ['Submitted', (r) => (r.createdAt ? r.createdAt.toDate().toISOString() : '')],
   ];

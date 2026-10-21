@@ -161,7 +161,7 @@ function validate() {
 
   const manual = method() === 'manual';
   for (const el of [f.firstName, f.lastName]) mark(el, !el.value.trim());
-  for (const el of [f.nationality, f.passportNumber, f.passportExpiry]) mark(el, manual && !el.value.trim());
+  for (const el of [f.nationality, f.passportNumber, f.passportIssued, f.passportExpiry]) mark(el, manual && !el.value.trim());
   if (!f.firstName.value.trim() || !f.lastName.value.trim()) problems.push('your name as it appears on your passport');
 
   if (manual) {
@@ -171,6 +171,13 @@ function validate() {
     if (!f.nationality.value) problems.push('your nationality');
     const pn = f.passportNumber.value.replace(/\s/g, '');
     if (!/^[A-Za-z0-9]{5,20}$/.test(pn)) { problems.push('a valid passport number (letters and numbers only)'); mark(f.passportNumber, true); }
+    const issued = f.passportIssued.value;
+    const today = new Date().toISOString().slice(0, 10);
+    if (!issued) problems.push('your passport issue date');
+    else if (issued > today || (f.passportExpiry.value && issued >= f.passportExpiry.value)) {
+      problems.push('a passport issue date that is in the past and before the expiration date');
+      mark(f.passportIssued, true);
+    }
     if (!f.passportExpiry.value) problems.push('your passport expiration date');
   } else {
     const file = f.passportFile.files[0];
@@ -231,6 +238,7 @@ form.addEventListener('submit', async (e) => {
       method: manual ? 'manual' : 'photo',
       nationality: manual ? form.nationality.value : '',
       passportNumber: manual ? form.passportNumber.value.replace(/\s/g, '').toUpperCase() : '',
+      passportIssued: manual ? form.passportIssued.value : '',
       passportExpiry: manual ? form.passportExpiry.value : '',
       matmidNumber: form.matmidNumber.value.replace(/\s/g, ''),
       passportFilePath: path,

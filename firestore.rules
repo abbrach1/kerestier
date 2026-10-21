@@ -11,7 +11,8 @@ service cloud.firestore {
     // Either a passport photo was uploaded, or the details were typed in.
     function validPhoto(d, id) {
       return d.method == 'photo'
-          && d.nationality == '' && d.passportNumber == '' && d.passportExpiry == '' && d.birthDate == ''
+          && d.nationality == '' && d.passportNumber == '' && d.passportIssued == '' && d.passportExpiry == ''
+          && d.birthDate == ''
           && d.passportFileName.matches('passport-[0-9]+[.][a-z0-9]{2,5}')
           && d.passportFilePath == 'passports/' + id + '/' + d.passportFileName;
     }
@@ -19,6 +20,7 @@ service cloud.firestore {
       return d.method == 'manual'
           && d.nationality.size() > 0
           && d.passportNumber.matches('[A-Z0-9]{5,20}')
+          && d.passportIssued.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
           && d.passportExpiry.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
           && d.birthDate.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
           && d.passportFilePath == '';
@@ -50,6 +52,7 @@ service cloud.firestore {
           && str(d.passportFilePath, 0, 120)
           && str(d.nationality, 0, 60)
           && str(d.passportNumber, 0, 20)
+          && str(d.passportIssued, 0, 10)
           && str(d.passportExpiry, 0, 10)
           && d.createdAt == request.time
           && (validPhoto(d, id) || validManual(d));
@@ -57,7 +60,7 @@ service cloud.firestore {
 
     function FIELDS() {
       return ['firstName', 'middleName', 'lastName', 'birthDate', 'method',
-              'nationality', 'passportNumber', 'passportExpiry', 'matmidNumber',
+              'nationality', 'passportNumber', 'passportIssued', 'passportExpiry', 'matmidNumber',
               'passportFilePath', 'passportFileName', 'trip', 'createdAt'];
     }
 
