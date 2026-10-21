@@ -81,7 +81,7 @@ function visible() {
     if (filter === 'photo' && r.method !== 'photo') return false;
     if (filter === 'matmid' && !r.matmidNumber) return false;
     if (!term) return true;
-    return [fullName(r), r.email, r.phone, r.passportNumber, r.matmidNumber]
+    return [fullName(r), r.passportNumber, r.matmidNumber]
       .some((v) => String(v || '').toLowerCase().includes(term));
   });
 }
@@ -100,7 +100,7 @@ function render() {
   $('empty').textContent = rows.length ? 'Nothing matches.' : 'No registrations yet.';
   $('rows').innerHTML = list.map((r) => `
     <tr data-id="${esc(r.id)}" tabindex="0">
-      <td class="strong">${esc(fullName(r))}<span class="cell-sub">${esc(r.email)}</span></td>
+      <td class="strong">${esc(fullName(r))}</td>
       <td>${r.method === 'photo' ? '<span class="tag">Photo</span>' : esc(r.nationality)}</td>
       <td class="mono">${esc(r.passportNumber) || '<span class="muted">—</span>'}</td>
       <td>${r.passportExpiry ? `<span class="${expiresTooSoon(r) ? 'bad' : ''}">${esc(fmtDate(r.passportExpiry))}</span>` : '<span class="muted">—</span>'}</td>
@@ -134,8 +134,6 @@ async function openDetails(id) {
     ['Middle name', r.middleName],
     ['Last name', r.lastName],
     ['Date of birth', r.birthDate ? fmtDate(r.birthDate) : ''],
-    ['Email', r.email],
-    ['Phone', r.phone],
     ['Nationality', r.nationality],
     ['Passport #', r.passportNumber],
     ['Expires', r.passportExpiry ? fmtDate(r.passportExpiry) + (expiresTooSoon(r) ? ' (too soon, must be valid through Jul 17, 2027)' : '') : ''],
@@ -191,12 +189,17 @@ $('export').addEventListener('click', () => {
   const cols = [
     ['First name', 'firstName'], ['Middle name', 'middleName'], ['Last name', 'lastName'],
     ['Date of birth', 'birthDate'],
-    ['Email', 'email'], ['Phone', 'phone'], ['Nationality', 'nationality'],
+    ['Nationality', 'nationality'],
     ['Passport #', 'passportNumber'], ['Passport expiry', 'passportExpiry'],
     ['El Al Matmid #', 'matmidNumber'], ['Sent as', 'method'],
     ['Submitted', (r) => (r.createdAt ? r.createdAt.toDate().toISOString() : '')],
   ];
-  const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  // Neutralize spreadsheet formulas, e.g. a name typed as =HYPERLINK(...).
+  const cell = (v) => {
+    let t = String(v ?? '');
+    if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+    return `"${t.replace(/"/g, '""')}"`;
+  };
   const lines = [cols.map(([h]) => cell(h)).join(',')]
     .concat(visible().map((r) => cols.map(([, k]) => cell(typeof k === 'function' ? k(r) : r[k])).join(',')));
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });

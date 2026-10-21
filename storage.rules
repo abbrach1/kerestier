@@ -3,14 +3,22 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Anyone can upload; only admins (see firestore.rules) can view. Nothing can be
     // overwritten or deleted from the browser.
+    // Only these types: no SVG or HTML, which could carry scripts.
+    function allowedType() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp|heic|heif)')
+          || request.resource.contentType == 'application/pdf';
+    }
+
     match /passports/{submissionId}/{fileName} {
       allow read: if request.auth != null
                   && request.auth.token.email_verified == true
                   && firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email));
       allow update, delete: if false;
-      allow create: if request.resource.size < 10 * 1024 * 1024
-                    && (request.resource.contentType.matches('image/.*')
-                        || request.resource.contentType == 'application/pdf');
+      allow create: if resource == null
+                    && request.resource.size < 10 * 1024 * 1024
+                    && submissionId.matches('[A-Za-z0-9]{20}')
+                    && fileName.matches('passport-[0-9]+[.][a-z0-9]{2,5}')
+                    && allowedType();
     }
     match /{allPaths=**} {
       allow read, write: if false;

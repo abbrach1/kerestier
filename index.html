@@ -32,7 +32,6 @@
           This form is for the Kerestir trip from the YTC campaign.
           We need these details to book flights. Please fill everything in
           <strong>exactly as it appears on your passport</strong>, including middle names.
-          Questions? Reply to the email that sent you here.
         </p>
       </div>
 
@@ -42,45 +41,15 @@
           <p class="hint">Use the spelling on your passport, not a nickname or Hebrew name.</p>
           <div class="row">
             <label for="firstName">First name
-              <input id="firstName" name="firstName" autocomplete="given-name" autocapitalize="words" required />
+              <input id="firstName" name="firstName" maxlength="80" autocomplete="given-name" autocapitalize="words" required />
             </label>
             <label for="middleName">Middle name <span class="opt">optional</span>
-              <input id="middleName" name="middleName" autocomplete="additional-name" autocapitalize="words" />
+              <input id="middleName" name="middleName" maxlength="80" autocomplete="additional-name" autocapitalize="words" />
             </label>
           </div>
           <label for="lastName">Last name
-            <input id="lastName" name="lastName" autocomplete="family-name" autocapitalize="words" required />
+            <input id="lastName" name="lastName" maxlength="80" autocomplete="family-name" autocapitalize="words" required />
           </label>
-
-          <div class="dob" role="group" aria-labelledby="dob-label">
-            <span class="dob__label" id="dob-label">Date of birth</span>
-            <div class="dob__fields">
-              <label for="bdayMonth" class="dob__month"><span class="sr">Month</span>
-                <select id="bdayMonth" name="bdayMonth" autocomplete="bday-month" required>
-                  <option value="">Month</option>
-                  <option value="01">January</option><option value="02">February</option><option value="03">March</option>
-                  <option value="04">April</option><option value="05">May</option><option value="06">June</option>
-                  <option value="07">July</option><option value="08">August</option><option value="09">September</option>
-                  <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-                </select>
-              </label>
-              <label for="bdayDay"><span class="sr">Day</span>
-                <input id="bdayDay" name="bdayDay" autocomplete="bday-day" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="Day" required />
-              </label>
-              <label for="bdayYear"><span class="sr">Year</span>
-                <input id="bdayYear" name="bdayYear" autocomplete="bday-year" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Year" required />
-              </label>
-            </div>
-          </div>
-
-          <div class="row">
-            <label for="email">Email
-              <input id="email" name="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" required />
-            </label>
-            <label for="phone">Cell phone
-              <input id="phone" name="phone" type="tel" autocomplete="tel" required />
-            </label>
-          </div>
         </fieldset>
 
         <fieldset>
@@ -100,7 +69,7 @@
           <div class="panel" data-method="photo">
             <label class="upload">Photo of passport photo page
               <span class="hint">A clear, flat photo or scan of the page with your picture, with every corner in frame. JPG, PNG, HEIC or PDF, up to 10 MB.</span>
-              <input id="passportFile" name="passportFile" type="file" accept="image/*,application/pdf" />
+              <input id="passportFile" name="passportFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.heic,.heif" />
             </label>
             <div class="preview" id="preview" hidden></div>
           </div>
@@ -109,9 +78,29 @@
             <label>Nationality (country that issued the passport)
               <select id="nationality" name="nationality" autocomplete="country-name"></select>
             </label>
+            <div class="dob" role="group" aria-labelledby="dob-label">
+              <span class="dob__label" id="dob-label">Date of birth</span>
+              <div class="dob__fields">
+                <label for="bdayMonth" class="dob__month"><span class="sr">Month</span>
+                  <select id="bdayMonth" name="bdayMonth" autocomplete="bday-month">
+                    <option value="">Month</option>
+                    <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+                    <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+                    <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+                    <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                  </select>
+                </label>
+                <label for="bdayDay"><span class="sr">Day</span>
+                  <input id="bdayDay" name="bdayDay" autocomplete="bday-day" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="Day" />
+                </label>
+                <label for="bdayYear"><span class="sr">Year</span>
+                  <input id="bdayYear" name="bdayYear" autocomplete="bday-year" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Year" />
+                </label>
+              </div>
+            </div>
             <div class="row">
               <label>Passport number
-                <input id="passportNumber" name="passportNumber" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+                <input id="passportNumber" name="passportNumber" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" />
               </label>
               <label>Expiration date
                 <input id="passportExpiry" name="passportExpiry" type="date" autocomplete="off" />
@@ -124,7 +113,7 @@
         <fieldset>
           <legend>El Al Matmid</legend>
           <label>Matmid number <span class="opt">if you have one</span>
-            <input id="matmidNumber" name="matmidNumber" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input id="matmidNumber" name="matmidNumber" maxlength="12" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
           </label>
           <p class="hint">We'll add it to your booking so you earn points.</p>
         </fieldset>

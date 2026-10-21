@@ -1,8 +1,9 @@
 # YTC Kerestir Trip Registration
 
 Passport-detail collection form for the Kerestir trip from the Yeshiva Toras Chaim campaign (departing Jan 17, 2027).
-Collects legal name and contact info, then either a photo of the passport page **or** typed
-passport details (nationality, number, expiration), plus an optional El Al Matmid number. It warns anyone whose passport expires
+Collects the traveler's legal name, then either a photo of the passport page **or** typed
+passport details (nationality, date of birth, passport number, expiration), plus an optional
+El Al Matmid number. The photo uploads as soon as it's picked. It warns anyone whose passport expires
 before **July 17, 2027** (six months after departure).
 
 Built with Vite and plain JS. Data goes to Firebase (Firestore and Storage), and the site is hosted on Vercel.
@@ -41,13 +42,35 @@ Remove the document to revoke access.
 ## Email alerts (Resend)
 
 Each new registration emails the addresses in `NOTIFY_TO`. The email has the traveler's name,
-contact info, whether they sent a photo, their Matmid number and an expiry warning when needed.
+whether they sent a photo, their Matmid number and an expiry warning when needed.
 Passport numbers are left out of email on purpose; open `/admin` for those.
 It runs as a Vercel function (`api/notify.js`) and sends at most one email per registration.
 
 1. Create a Resend account and verify your sending domain (e.g. ytchaim.com).
 2. Add the server-only env vars from `.env.example` in Vercel: `RESEND_API_KEY`,
    `NOTIFY_FROM`, `NOTIFY_TO`, `FIREBASE_SERVICE_ACCOUNT` (and optionally `SITE_URL`).
+
+## Security
+
+- `firestore.rules` / `storage.rules`: the public form can only create. Every field is typed and
+  size-capped. Only JPEG/PNG/WebP/HEIC/PDF up to 10 MB are accepted, and files can't be overwritten.
+  Only Google accounts listed in `admins` can read anything. Nothing can be edited or deleted from
+  a browser.
+- Passport numbers are never put in email.
+- The CSV export neutralizes spreadsheet formulas.
+- `vercel.json` sets no-framing, nosniff and noindex headers.
+- Rules are tested with the Firebase emulator (see below).
+
+**Recommended in the Google Cloud console:** restrict the Firebase browser API key (APIs & Services
+→ Credentials) to your site's domain. Optionally turn on Firebase App Check to block bots.
+After the trip, delete the `passports/` folder and the `tripRegistrations` collection.
+
+## Testing against the emulator
+
+```
+firebase emulators:start --only firestore,storage --project demo-ytc
+VITE_USE_EMULATORS=true VITE_FIREBASE_PROJECT_ID=demo-ytc VITE_FIREBASE_STORAGE_BUCKET=demo-ytc.appspot.com VITE_FIREBASE_API_KEY=x VITE_FIREBASE_APP_ID=x npm run dev
+```
 
 ## Local dev
 

@@ -38,8 +38,6 @@ export default async function handler(req, res) {
   const adminUrl = `${process.env.SITE_URL || `https://${req.headers.host}`}/admin`;
   const rows = [
     ['Name', name],
-    ['Email', r.email],
-    ['Phone', r.phone],
     ['Passport', r.method === 'photo' ? 'Sent a photo' : `${r.nationality}, expires ${r.passportExpiry}`],
     ['El Al Matmid #', r.matmidNumber || '—'],
   ];
@@ -61,7 +59,6 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       from: process.env.NOTIFY_FROM,
       to: process.env.NOTIFY_TO.split(',').map((s) => s.trim()).filter(Boolean),
-      reply_to: r.email || undefined,
       subject: `Kerestir trip registration: ${name}${tooSoon ? ' (passport expires too soon)' : ''}`,
       html,
     }),

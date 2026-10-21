@@ -2,6 +2,8 @@ import './style.css';
 import { COMMON, COUNTRIES } from './countries.js';
 import { TRIP, MIN_EXPIRY } from './config.js';
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
+// Must match storage.rules.
+const ALLOWED_TYPES = /^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/;
 
 const form = document.getElementById('reg');
 const submitBtn = document.getElementById('submit');
@@ -116,7 +118,7 @@ form.passportFile.addEventListener('change', () => {
     preview.innerHTML = '<p>That file is over 10 MB. Try a smaller photo or a screenshot of it.</p>';
     return;
   }
-  if (!/^image\/|^application\/pdf$/.test(fileInfo(file).contentType)) {
+  if (!ALLOWED_TYPES.test(fileInfo(file).contentType)) {
     preview.innerHTML = '<p>That file type isn\'t supported. Please choose a photo or a PDF.</p>';
     return;
   }
@@ -158,16 +160,14 @@ function validate() {
   const mark = (el, bad) => el.classList.toggle('invalid', bad);
 
   const manual = method() === 'manual';
-  for (const el of [f.firstName, f.lastName, f.email, f.phone]) mark(el, !el.value.trim());
+  for (const el of [f.firstName, f.lastName]) mark(el, !el.value.trim());
   for (const el of [f.nationality, f.passportNumber, f.passportExpiry]) mark(el, manual && !el.value.trim());
   if (!f.firstName.value.trim() || !f.lastName.value.trim()) problems.push('your name as it appears on your passport');
-  const dobBad = !birthDate();
-  for (const el of [f.bdayMonth, f.bdayDay, f.bdayYear]) mark(el, dobBad);
-  if (dobBad) problems.push('a valid date of birth');
-  if (!/^\S+@\S+\.\S+$/.test(f.email.value.trim())) { problems.push('a valid email'); mark(f.email, true); }
-  if (f.phone.value.replace(/\D/g, '').length < 7) { problems.push('a phone number'); mark(f.phone, true); }
 
   if (manual) {
+    const dobBad = !birthDate();
+    for (const el of [f.bdayMonth, f.bdayDay, f.bdayYear]) mark(el, dobBad);
+    if (dobBad) problems.push('a valid date of birth');
     if (!f.nationality.value) problems.push('your nationality');
     const pn = f.passportNumber.value.replace(/\s/g, '');
     if (!/^[A-Za-z0-9]{5,20}$/.test(pn)) { problems.push('a valid passport number (letters and numbers only)'); mark(f.passportNumber, true); }
@@ -176,7 +176,7 @@ function validate() {
     const file = f.passportFile.files[0];
     if (!file) problems.push('a photo of your passport (or switch to "Type them in")');
     else if (file.size > MAX_FILE_BYTES) problems.push('a passport photo under 10 MB');
-    else if (!/^image\/|^application\/pdf$/.test(fileInfo(file).contentType)) problems.push('an image or PDF of your passport');
+    else if (!ALLOWED_TYPES.test(fileInfo(file).contentType)) problems.push('an image or PDF of your passport');
   }
 
   const matmid = f.matmidNumber.value.replace(/\s/g, '');
@@ -227,9 +227,7 @@ form.addEventListener('submit', async (e) => {
       firstName: form.firstName.value.trim(),
       middleName: form.middleName.value.trim(),
       lastName: form.lastName.value.trim(),
-      birthDate: birthDate(),
-      email: form.email.value.trim().toLowerCase(),
-      phone: form.phone.value.trim(),
+      birthDate: manual ? birthDate() : '',
       method: manual ? 'manual' : 'photo',
       nationality: manual ? form.nationality.value : '',
       passportNumber: manual ? form.passportNumber.value.replace(/\s/g, '').toUpperCase() : '',
