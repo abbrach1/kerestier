@@ -46,7 +46,7 @@ service cloud.firestore {
           && str(d.middleName, 0, 80)
           && str(d.lastName, 1, 80)
           && str(d.birthDate, 0, 10)
-          && str(d.matmidNumber, 0, 12) && d.matmidNumber.matches('[0-9]*')
+          && str(d.matmidNumber, 0, 40)
           && str(d.trip, 1, 60)
           && str(d.passportFileName, 0, 60)
           && str(d.passportFilePath, 0, 120)

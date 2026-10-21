@@ -6,18 +6,34 @@ import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 const MIN_EXPIRY = '2027-07-17';
 
-if (!getApps().length) {
-  initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
+function getDb() {
+  if (!getApps().length) {
+    initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
+  }
+  return getFirestore();
 }
-const db = getFirestore();
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+const REQUIRED_ENV = ['RESEND_API_KEY', 'NOTIFY_FROM', 'NOTIFY_TO', 'FIREBASE_SERVICE_ACCOUNT'];
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
+  const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
+  if (missing.length) {
+    console.error('Missing env vars:', missing.join(', '));
+    return res.status(500).json({ error: 'missing_env', missing });
+  }
   const id = req.body?.id;
   if (typeof id !== 'string' || !/^[A-Za-z0-9]{10,40}$/.test(id)) return res.status(400).end();
 
+  let db;
+  try {
+    db = getDb();
+  } catch (err) {
+    console.error('FIREBASE_SERVICE_ACCOUNT is not valid JSON for a service account', err);
+    return res.status(500).json({ error: 'bad_service_account' });
+  }
   const docRef = db.collection('tripRegistrations').doc(id);
   let r;
   try {
@@ -28,8 +44,8 @@ export default async function handler(req, res) {
       return snap.data();
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).end();
+    console.error('Firestore lookup failed', err);
+    return res.status(500).json({ error: 'firestore_failed' });
   }
   if (!r) return res.status(204).end();
 
@@ -65,10 +81,14 @@ export default async function handler(req, res) {
   });
 
   if (!send.ok) {
-    console.error('Resend failed', send.status, await send.text());
+    // Resend explains the problem, e.g. "The ytchaim.com domain is not verified".
+    const detail = await send.text();
+    console.error('Resend failed', send.status, detail);
     // Let a retry try again.
     await docRef.update({ notifiedAt: FieldValue.delete() }).catch(() => {});
-    return res.status(502).end();
+    let message = '';
+    try { message = JSON.parse(detail).message || ''; } catch {}
+    return res.status(502).json({ error: 'resend_failed', status: send.status, message });
   }
   return res.status(204).end();
 }

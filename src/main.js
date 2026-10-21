@@ -66,14 +66,42 @@ const submissionId = Array.from(crypto.getRandomValues(new Uint8Array(20)), (b) 
 
 let upload = null; // { file, name, path, percent, promise, failed }
 
+// Phone photos are often 3–12 MB. Resize to a size that's still easy to read
+// (2400px on the long side) so uploads are quick on mobile data.
+const MAX_SIDE = 2400;
+async function shrinkImage(file) {
+  const { contentType } = fileInfo(file);
+  if (!contentType.startsWith('image/')) return null;
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && contentType === 'image/jpeg' && file.size < 1.5 * 1024 * 1024) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    bmp.close?.();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+    return blob && blob.size < file.size ? blob : null;
+  } catch {
+    return null; // e.g. HEIC on browsers that can't decode it; upload the original
+  }
+}
+
 function startUpload(file) {
-  const { contentType, ext } = fileInfo(file);
-  const name = `passport-${Date.now()}.${ext}`;
-  const current = { file, name, path: `passports/${submissionId}/${name}`, percent: 0 };
+  const current = { file, name: '', path: '', percent: 0 };
   upload = current;
   showUploadStatus('progress', 0);
-  current.promise = loadFirebase().then(({ ref, uploadBytesResumable, storage }) => new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(ref(storage, current.path), file, { contentType });
+  current.promise = shrinkImage(file).then((small) => {
+    if (small && upload === current) showPreview(small);
+    const data = small || file;
+    const { contentType, ext } = small ? { contentType: 'image/jpeg', ext: 'jpg' } : fileInfo(file);
+    if (data.size > MAX_FILE_BYTES) throw new Error('too-big');
+    current.name = `passport-${Date.now()}.${ext}`;
+    current.path = `passports/${submissionId}/${current.name}`;
+    return loadFirebase().then((fb) => ({ fb, data, contentType }));
+  }).then(({ fb: { ref, uploadBytesResumable, storage }, data, contentType }) => new Promise((resolve, reject) => {
+    const task = uploadBytesResumable(ref(storage, current.path), data, { contentType });
     task.on('state_changed', (snap) => {
       current.percent = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
       if (upload === current) showUploadStatus('progress', current.percent);
@@ -83,7 +111,7 @@ function startUpload(file) {
   }, (err) => {
     console.error(err);
     current.failed = true;
-    if (upload === current) showUploadStatus('failed');
+    if (upload === current) showUploadStatus(err.message === 'too-big' ? 'too-big' : 'failed');
     throw err;
   });
   current.promise.catch(() => {}); // handled on submit
@@ -102,10 +130,22 @@ function showUploadStatus(state, percent = 0) {
   const msg = box.querySelector('p');
   if (state === 'progress') msg.textContent = `Uploading… ${percent}%. You can keep filling out the form.`;
   if (state === 'done') msg.textContent = 'Uploaded.';
+  if (state === 'too-big') msg.textContent = 'That file is over 10 MB. Try a photo instead, or a smaller PDF.';
   if (state === 'failed') {
     msg.innerHTML = 'Upload failed. Check your connection and <button type="button" class="link" id="retry-upload">try again</button>.';
     msg.querySelector('#retry-upload').addEventListener('click', () => startUpload(upload.file));
   }
+}
+
+function showPreview(blobOrFile) {
+  let img = preview.querySelector('img');
+  if (!img) {
+    img = document.createElement('img');
+    img.alt = 'Passport photo preview';
+    preview.prepend(img);
+    preview.querySelector('.attached')?.remove();
+  }
+  img.src = URL.createObjectURL(blobOrFile);
 }
 
 form.passportFile.addEventListener('change', () => {
@@ -113,22 +153,23 @@ form.passportFile.addEventListener('change', () => {
   upload = null;
   preview.innerHTML = '';
   preview.hidden = !file;
+  document.getElementById('picker-text').textContent = file ? 'Choose a different photo or file' : 'Take a photo or choose a file';
   if (!file) return;
-  if (file.size > MAX_FILE_BYTES) {
-    preview.innerHTML = '<p>That file is over 10 MB. Try a smaller photo or a screenshot of it.</p>';
-    return;
-  }
-  if (!ALLOWED_TYPES.test(fileInfo(file).contentType)) {
+  const { contentType } = fileInfo(file);
+  if (!ALLOWED_TYPES.test(contentType)) {
     preview.innerHTML = '<p>That file type isn\'t supported. Please choose a photo or a PDF.</p>';
     return;
   }
-  if (file.type.startsWith('image/') && !/heic|heif/i.test(file.type)) {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    img.alt = 'Passport photo preview';
-    preview.append(img);
+  // Photos get resized before upload, so only PDFs need the size check up front.
+  if (!contentType.startsWith('image/') && file.size > MAX_FILE_BYTES) {
+    preview.innerHTML = '<p>That PDF is over 10 MB. Try taking a photo of the page instead.</p>';
+    return;
+  }
+  if (contentType.startsWith('image/') && !/heic|heif/.test(contentType)) {
+    showPreview(file);
   } else {
     const p = document.createElement('p');
+    p.className = 'attached';
     p.textContent = `Attached: ${file.name}`;
     preview.append(p);
   }
@@ -182,13 +223,10 @@ function validate() {
   } else {
     const file = f.passportFile.files[0];
     if (!file) problems.push('a photo of your passport (or switch to "Type them in")');
-    else if (file.size > MAX_FILE_BYTES) problems.push('a passport photo under 10 MB');
+    else if (!fileInfo(file).contentType.startsWith('image/') && file.size > MAX_FILE_BYTES) problems.push('a passport PDF under 10 MB');
     else if (!ALLOWED_TYPES.test(fileInfo(file).contentType)) problems.push('an image or PDF of your passport');
   }
 
-  const matmid = f.matmidNumber.value.replace(/\s/g, '');
-  if (matmid && !/^\d{5,12}$/.test(matmid)) { problems.push('a Matmid number with digits only (or leave it blank)'); mark(f.matmidNumber, true); }
-  else mark(f.matmidNumber, false);
 
   if (!f.confirm.checked) problems.push('the box confirming your details match your passport');
   return problems;
@@ -240,7 +278,7 @@ form.addEventListener('submit', async (e) => {
       passportNumber: manual ? form.passportNumber.value.replace(/\s/g, '').toUpperCase() : '',
       passportIssued: manual ? form.passportIssued.value : '',
       passportExpiry: manual ? form.passportExpiry.value : '',
-      matmidNumber: form.matmidNumber.value.replace(/\s/g, ''),
+      matmidNumber: form.matmidNumber.value.trim(),
       passportFilePath: path,
       passportFileName: name,
       trip: TRIP,

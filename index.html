@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#fffdf9" />
+    <meta name="format-detection" content="telephone=no" />
     <title>Kerestir Trip Registration · Yeshiva Toras Chaim</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" href="/logo.png" type="image/png" />
@@ -41,14 +43,14 @@
           <p class="hint">Use the spelling on your passport, not a nickname or Hebrew name.</p>
           <div class="row">
             <label for="firstName">First name
-              <input id="firstName" name="firstName" maxlength="80" autocomplete="given-name" autocapitalize="words" required />
+              <input id="firstName" name="firstName" enterkeyhint="next" maxlength="80" autocomplete="given-name" autocapitalize="words" required />
             </label>
             <label for="middleName">Middle name <span class="opt">optional</span>
-              <input id="middleName" name="middleName" maxlength="80" autocomplete="additional-name" autocapitalize="words" />
+              <input id="middleName" name="middleName" enterkeyhint="next" maxlength="80" autocomplete="additional-name" autocapitalize="words" />
             </label>
           </div>
           <label for="lastName">Last name
-            <input id="lastName" name="lastName" maxlength="80" autocomplete="family-name" autocapitalize="words" required />
+            <input id="lastName" name="lastName" enterkeyhint="next" maxlength="80" autocomplete="family-name" autocapitalize="words" required />
           </label>
         </fieldset>
 
@@ -67,15 +69,19 @@
           </div>
 
           <div class="panel" data-method="photo">
-            <label class="upload">Photo of passport photo page
-              <span class="hint">A clear, flat photo or scan of the page with your picture, with every corner in frame. JPG, PNG, HEIC or PDF, up to 10 MB.</span>
-              <input id="passportFile" name="passportFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.heic,.heif" />
+            <p class="field-title" id="upload-title">Photo of passport photo page</p>
+            <p class="hint">A clear, flat photo of the page with your picture, with all four corners in frame and no glare.</p>
+            <label class="picker" for="passportFile">
+              <input id="passportFile" name="passportFile" type="file" aria-labelledby="upload-title"
+                     accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.heic,.heif" />
+              <span class="picker__main" id="picker-text">Take a photo or choose a file</span>
+              <span class="picker__sub">JPG, PNG, HEIC or PDF</span>
             </label>
             <div class="preview" id="preview" hidden></div>
           </div>
 
           <div class="panel" data-method="manual" hidden>
-            <label>Nationality (country that issued the passport)
+            <label for="nationality">Nationality (country that issued the passport)
               <select id="nationality" name="nationality" autocomplete="country-name"></select>
             </label>
             <div class="dob" role="group" aria-labelledby="dob-label">
@@ -91,15 +97,15 @@
                   </select>
                 </label>
                 <label for="bdayDay"><span class="sr">Day</span>
-                  <input id="bdayDay" name="bdayDay" autocomplete="bday-day" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="Day" />
+                  <input id="bdayDay" name="bdayDay" enterkeyhint="next" autocomplete="bday-day" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="Day" />
                 </label>
                 <label for="bdayYear"><span class="sr">Year</span>
-                  <input id="bdayYear" name="bdayYear" autocomplete="bday-year" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Year" />
+                  <input id="bdayYear" name="bdayYear" enterkeyhint="next" autocomplete="bday-year" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Year" />
                 </label>
               </div>
             </div>
             <label for="passportNumber">Passport number
-              <input id="passportNumber" name="passportNumber" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+              <input id="passportNumber" name="passportNumber" enterkeyhint="next" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" />
             </label>
             <div class="row">
               <label for="passportIssued">Issue date
@@ -115,8 +121,8 @@
 
         <fieldset>
           <legend>El Al Matmid</legend>
-          <label>Matmid number <span class="opt">if you have one</span>
-            <input id="matmidNumber" name="matmidNumber" maxlength="12" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+          <label for="matmidNumber">Matmid number <span class="opt">if you have one</span>
+            <input id="matmidNumber" name="matmidNumber" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done" />
           </label>
           <p class="hint">We'll add it to your booking so you earn points.</p>
         </fieldset>
@@ -137,6 +143,7 @@
     </main>
 
     <footer class="wrap footer">
+      <p class="contact">For any questions, please contact R&rsquo; Yehuda Schlessinger.</p>
       <p>Your passport details are only used to book travel for this trip.</p>
       <p class="credit">&copy; 2026 <a href="https://filttr.org" target="_blank" rel="noopener">filttr.org</a></p>
     </footer>

@@ -68,10 +68,24 @@ label .hint { margin: 2px 0 8px; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
 @media (max-width: 560px) {
+  .wrap { padding: 0 16px; }
   .row { grid-template-columns: 1fr; }
+  .masthead__inner { padding-top: 10px; padding-bottom: 10px; }
   .masthead__note { display: none; }
-  h1 { font-size: 28px; }
-  fieldset { padding: 18px 16px 4px; }
+  .brand { gap: 10px; }
+  .brand img { width: 52px; height: 52px; }
+  .brand__name { font-size: 17px; }
+  .intro { padding-top: 24px; }
+  h1 { font-size: 27px; }
+  form { margin-top: 20px; }
+  fieldset { padding: 16px 14px 2px; margin-bottom: 16px; }
+  legend { font-size: 19px; }
+  .notice { font-size: 14.5px; }
+  .choice span { padding: 12px 6px; }
+  button[type="submit"] { width: 100%; }
+  .check { padding: 4px 0; }
+  .check input { width: 22px; height: 22px; }
+  .footer { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
 
 input, select {
@@ -83,7 +97,21 @@ input, select {
 }
 input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
 input[name="passportNumber"] { text-transform: uppercase; letter-spacing: .06em; }
-input[type="file"] { padding: 8px; background: var(--paper); }
+input[type="date"] { -webkit-appearance: none; appearance: none; min-width: 0; text-align: left; }
+input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.field-title { font-weight: 500; font-size: 15px; margin: 0 0 4px; }
+
+.picker {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; min-height: 96px; margin: 0 0 12px; padding: 16px;
+  border: 1.5px dashed #bfae98; border-radius: 4px; background: var(--paper);
+  text-align: center; cursor: pointer;
+}
+.picker:hover { border-color: var(--brand); background: #f1ebe1; }
+.picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; min-height: 0; }
+.picker:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
+.picker__main { font-weight: 600; color: var(--brand-dark); }
+.picker__sub { font-size: 13px; color: var(--muted); font-weight: 400; }
 input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; margin: 2px 0 0; accent-color: var(--brand-dark); flex: none; }
 .invalid { border-color: var(--error); }
 
@@ -121,10 +149,10 @@ input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; margin: 2px 0
 .upload-status .bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
 .upload-status .bar span { display: block; height: 100%; width: 0; background: var(--brand); transition: width .2s; }
 .upload-status[data-state="done"] .bar span { background: var(--ok); }
-.upload-status[data-state="failed"] .bar span { background: var(--error); }
+.upload-status[data-state="failed"] .bar span, .upload-status[data-state="too-big"] .bar span { background: var(--error); width: 100% !important; }
 .upload-status p { margin: 6px 0 0; }
 .upload-status[data-state="done"] p { color: var(--ok); font-weight: 500; }
-.upload-status[data-state="failed"] p { color: var(--error); }
+.upload-status[data-state="failed"] p, .upload-status[data-state="too-big"] p { color: var(--error); }
 .preview p { margin: 0; font-size: 14px; color: var(--muted); }
 
 .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; margin: 4px 0 20px; }
@@ -146,6 +174,7 @@ button:disabled { opacity: .6; cursor: wait; }
 
 .footer { padding-top: 32px; padding-bottom: 32px; font-size: 13px; color: var(--muted); }
 .footer p { margin: 0 0 6px; }
+.contact { font-size: 15px; color: var(--ink); margin-bottom: 10px; padding-top: 18px; border-top: 1px solid var(--line); }
 .credit { font-size: 12px; opacity: .8; }
 .credit a { color: inherit; }
 
