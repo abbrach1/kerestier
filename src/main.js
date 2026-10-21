@@ -3,10 +3,7 @@ import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { db, storage } from './firebase.js';
 import { COMMON, COUNTRIES } from './countries.js';
-
-const TRIP = 'Winter 2027';
-// Departure is Jan 17, 2027; passports must be valid 6 months past that.
-const MIN_EXPIRY = '2027-07-17';
+import { TRIP, MIN_EXPIRY } from './config.js';
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 const form = document.getElementById('reg');
@@ -161,6 +158,14 @@ form.addEventListener('submit', async (e) => {
       trip: TRIP,
       createdAt: serverTimestamp(),
     });
+
+    // Email the organizers. Never block the traveler on this.
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: docRef.id }),
+      keepalive: true,
+    }).catch(() => {});
 
     form.hidden = true;
     document.getElementById('done').hidden = false;

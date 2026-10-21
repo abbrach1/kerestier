@@ -1,6 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Organizers are listed in the `admins` collection, one doc per Google email.
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email_verified == true
+          && exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
     // Either a passport photo was uploaded, or the details were typed in.
     function validPhoto(d, id) {
       return d.method == 'photo'
@@ -15,10 +22,11 @@ service cloud.firestore {
           && d.passportExpiry is string && d.passportExpiry.size() == 10;
     }
 
-    // Public form can only create a submission. Nobody can read, list, edit or
-    // delete from the browser. View submissions in the Firebase console.
+    // The public form can only create. Only admins can read; nobody can edit or
+    // delete from the browser.
     match /tripRegistrations/{id} {
-      allow read, update, delete: if false;
+      allow read: if isAdmin();
+      allow update, delete: if false;
       allow create: if request.resource.data.keys().hasOnly([
                          'firstName', 'middleName', 'lastName', 'email', 'phone', 'method',
                          'nationality', 'passportNumber', 'passportExpiry',

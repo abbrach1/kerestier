@@ -1,9 +1,13 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Upload only: passport scans can't be read, overwritten or deleted from the browser.
+    // Anyone can upload; only admins (see firestore.rules) can view. Nothing can be
+    // overwritten or deleted from the browser.
     match /passports/{submissionId}/{fileName} {
-      allow read, update, delete: if false;
+      allow read: if request.auth != null
+                  && request.auth.token.email_verified == true
+                  && firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email));
+      allow update, delete: if false;
       allow create: if request.resource.size < 10 * 1024 * 1024
                     && (request.resource.contentType.matches('image/.*')
                         || request.resource.contentType == 'application/pdf');

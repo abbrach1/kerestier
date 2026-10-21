@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrations · YTC Admin</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Frank+Ruhl+Libre:wght@500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body class="admin">
+    <header class="masthead">
+      <div class="wrap wrap--wide masthead__inner">
+        <a class="brand" href="/admin">
+          <img src="/logo.png" onerror="this.onerror=null;this.src='/logo.svg'" alt="" width="48" height="48" />
+          <span class="brand__text">
+            <span class="brand__name">Yeshiva Toras Chaim</span>
+            <span class="brand__heb">Trip registrations</span>
+          </span>
+        </a>
+        <span class="who" id="who" hidden>
+          <span id="who-email"></span>
+          <button type="button" class="link" id="sign-out">Sign out</button>
+        </span>
+      </div>
+    </header>
+
+    <main class="wrap wrap--wide">
+      <section class="gate" id="gate" hidden>
+        <h1>Sign in</h1>
+        <p id="gate-msg">Organizers only. Sign in with the Google account that's been given access.</p>
+        <button type="button" id="sign-in">Sign in with Google</button>
+      </section>
+
+      <section id="app" hidden>
+        <div class="toolbar">
+          <div>
+            <h1 class="admin-title">Registrations <span class="count" id="count"></span></h1>
+            <p class="sub" id="summary"></p>
+          </div>
+          <div class="toolbar__actions">
+            <input type="search" id="search" placeholder="Search name, email, passport #" aria-label="Search" />
+            <select id="filter" aria-label="Filter">
+              <option value="all">All</option>
+              <option value="expiring">Expires before Jul 17, 2027</option>
+              <option value="photo">Photo only (needs details typed up)</option>
+              <option value="matmid">Has Matmid #</option>
+            </select>
+            <button type="button" class="secondary" id="export">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="list">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Nationality</th>
+                <th>Passport #</th>
+                <th>Expires</th>
+                <th>Matmid #</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <p class="empty" id="empty" hidden>No registrations yet.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="drawer" id="drawer" hidden>
+      <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="d-name">
+        <div class="drawer__head">
+          <h2 id="d-name"></h2>
+          <button type="button" class="link" id="d-close">Close</button>
+        </div>
+        <dl class="details" id="d-fields"></dl>
+        <div class="d-passport" id="d-passport"></div>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

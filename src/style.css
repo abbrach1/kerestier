@@ -130,3 +130,66 @@ button:disabled { opacity: .6; cursor: wait; }
 .done p { color: var(--muted); max-width: 52ch; }
 
 .footer { padding-top: 32px; padding-bottom: 40px; font-size: 13px; color: var(--muted); }
+
+/* ---------- Admin ---------- */
+.wrap--wide { max-width: 1180px; }
+.admin .brand img { width: 48px; height: 48px; }
+.admin .brand__heb { font-family: var(--sans); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+.who { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
+
+button.link {
+  background: none; color: var(--brand-dark); padding: 0; min-height: 0;
+  font-weight: 500; text-decoration: underline; text-underline-offset: 3px;
+}
+button.link:hover { background: none; color: var(--ink); }
+button.secondary { background: var(--card); color: var(--ink); border: 1px solid #cfc4b4; font-weight: 500; padding: 10px 16px; min-height: 44px; }
+button.secondary:hover { background: #fff; border-color: var(--brand); }
+
+.gate { padding: 64px 0; max-width: 460px; }
+.gate p { color: var(--muted); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 32px 0 18px; }
+.admin-title { font-size: 30px; margin: 0; }
+.count { font-family: var(--sans); font-size: 15px; color: var(--muted); vertical-align: middle; margin-left: 6px; }
+.sub { margin: 4px 0 0; color: var(--error); font-size: 14px; min-height: 1em; }
+.toolbar__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.toolbar__actions input, .toolbar__actions select { width: auto; margin: 0; }
+.toolbar__actions input { min-width: 240px; }
+
+.table-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 4px; overflow-x: auto; margin-bottom: 48px; }
+table.list { width: 100%; border-collapse: collapse; font-size: 14px; }
+.list th {
+  text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.list td { padding: 12px 14px; border-bottom: 1px solid #efe8dd; vertical-align: top; white-space: nowrap; }
+.list tbody tr { cursor: pointer; }
+.list tbody tr:hover, .list tbody tr:focus { background: #f9f5ee; outline: none; }
+.list tbody tr:last-child td { border-bottom: 0; }
+.strong { font-weight: 500; }
+.cell-sub { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; letter-spacing: .03em; }
+.muted { color: var(--muted); }
+.bad { color: var(--error); font-weight: 500; }
+.tag { display: inline-block; font-size: 12px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); background: var(--paper); }
+.empty { padding: 28px 14px; margin: 0; color: var(--muted); }
+
+.drawer { position: fixed; inset: 0; background: rgba(47, 40, 34, .35); display: flex; justify-content: flex-end; z-index: 10; }
+.drawer[hidden] { display: none; }
+.drawer__panel { background: var(--card); width: min(520px, 100%); height: 100%; overflow-y: auto; padding: 24px 28px 40px; box-shadow: -1px 0 0 var(--line); }
+.drawer__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+.drawer__head h2 { font-family: var(--serif); font-weight: 400; font-size: 24px; margin: 0; }
+.details { margin: 0 0 24px; }
+.details > div { display: grid; grid-template-columns: 130px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid #efe8dd; }
+.details dt { color: var(--muted); font-size: 14px; }
+.details dd { margin: 0; font-size: 15px; display: flex; justify-content: space-between; gap: 10px; word-break: break-word; }
+button.copy { background: none; color: var(--brand-dark); border: 1px solid var(--line); font-size: 12px; font-weight: 500; padding: 2px 8px; min-height: 0; border-radius: 3px; flex: none; }
+button.copy:hover { background: var(--paper); }
+.d-passport img { max-width: 100%; border: 1px solid var(--line); border-radius: 3px; display: block; }
+.d-passport p { font-size: 13px; }
+
+@media (max-width: 640px) {
+  .toolbar__actions input { min-width: 0; flex: 1 1 100%; }
+  .who #who-email { display: none; }
+  .details > div { grid-template-columns: 1fr; gap: 2px; }
+}
