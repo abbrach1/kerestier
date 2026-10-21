@@ -1,10 +1,11 @@
 import './style.css';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { ref, getDownloadURL } from 'firebase/storage';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import { auth, db, storage } from './firebase.js';
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { app as firebaseApp, db, storage } from './firebase.js';
 import { MIN_EXPIRY } from './config.js';
 
+const auth = getAuth(firebaseApp);
 const $ = (id) => document.getElementById(id);
 const gate = $('gate');
 const app = $('app');
@@ -187,7 +188,7 @@ $('export').addEventListener('click', () => {
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `ytc-trip-registrations-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `ytc-kerestir-registrations-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
 });

@@ -47,7 +47,7 @@ export default async function handler(req, res) {
   // Passport numbers stay out of email on purpose; open the admin page for those.
   const html = `
     <div style="font-family:Georgia,serif;color:#2f2822;max-width:520px">
-      <p style="font-size:18px;margin:0 0 14px">New trip registration: <strong>${esc(name)}</strong></p>
+      <p style="font-size:18px;margin:0 0 14px">New Kerestir trip registration: <strong>${esc(name)}</strong></p>
       ${tooSoon ? `<p style="background:#f7ecd9;border-left:3px solid #c39553;padding:8px 12px;font-family:Arial,sans-serif;font-size:14px">Passport expires ${esc(r.passportExpiry)}, before the July 17, 2027 cutoff.</p>` : ''}
       <table style="font-family:Arial,sans-serif;font-size:14px;border-collapse:collapse">
         ${rows.map(([k, v]) => `<tr><td style="color:#776b60;padding:4px 16px 4px 0">${esc(k)}</td><td style="padding:4px 0">${esc(v)}</td></tr>`).join('')}
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       from: process.env.NOTIFY_FROM,
       to: process.env.NOTIFY_TO.split(',').map((s) => s.trim()).filter(Boolean),
       reply_to: r.email || undefined,
-      subject: `Trip registration: ${name}${tooSoon ? ' (passport expires too soon)' : ''}`,
+      subject: `Kerestir trip registration: ${name}${tooSoon ? ' (passport expires too soon)' : ''}`,
       html,
     }),
   });

@@ -33,13 +33,14 @@ body {
   gap: 16px; padding-top: 14px; padding-bottom: 14px;
 }
 .brand { display: flex; align-items: center; gap: 14px; color: var(--ink); text-decoration: none; }
-.brand img { width: 64px; height: 64px; object-fit: contain; }
+.brand img { width: 72px; height: 72px; object-fit: contain; }
 .brand__text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand__name { font-family: var(--serif); font-size: 19px; letter-spacing: .02em; }
 .brand__heb { font-family: 'Frank Ruhl Libre', serif; color: var(--brand); font-size: 15px; text-align: left; }
 .masthead__note { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 
 .intro { padding: 40px 0 8px; }
+.eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--brand); }
 h1 { font-family: var(--serif); font-weight: 400; font-size: 34px; margin: 0 0 10px; }
 .intro p { margin: 0; color: var(--muted); max-width: 56ch; }
 .intro strong { color: var(--ink); font-weight: 600; }
@@ -133,7 +134,7 @@ button:disabled { opacity: .6; cursor: wait; }
 
 /* ---------- Admin ---------- */
 .wrap--wide { max-width: 1180px; }
-.admin .brand img { width: 48px; height: 48px; }
+.admin .brand img { width: 56px; height: 56px; }
 .admin .brand__heb { font-family: var(--sans); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
 .who { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
 

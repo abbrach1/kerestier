@@ -1,1 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#8b7765" stroke-width="1.5"/><circle cx="32" cy="32" r="24" fill="#8b7765"/><text x="32" y="37" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" letter-spacing=".6" fill="#fbf8f3">YTC</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Yeshiva Toras Chaim">
+  <defs>
+    <path id="top" d="M 22 100 A 78 78 0 0 1 178 100" />
+    <path id="bottom" d="M 18 100 A 82 82 0 0 0 182 100" />
+    <clipPath id="disc"><circle cx="100" cy="100" r="62" /></clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="97" fill="#fffdf9" stroke="#8b7765" stroke-width="1.5" />
+  <text font-family="'Frank Ruhl Libre', 'David', serif" font-size="21" font-weight="500" fill="#7a6655" text-anchor="middle">
+    <textPath href="#top" startOffset="50%">תורת חיים</textPath>
+  </text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="12.5" letter-spacing="2.6" fill="#7a6655" text-anchor="middle">
+    <textPath href="#bottom" startOffset="50%">YESHIVA TORAS CHAIM</textPath>
+  </text>
+  <circle cx="22" cy="100" r="2.2" fill="#8b7765" />
+  <circle cx="178" cy="100" r="2.2" fill="#8b7765" />
+  <circle cx="100" cy="100" r="62" fill="#8b7765" />
+  <g clip-path="url(#disc)" fill="#f6f2eb">
+    <!-- tower -->
+    <rect x="70" y="50" width="26" height="100" />
+    <rect x="74" y="46" width="18" height="5" />
+    <!-- main wing -->
+    <rect x="96" y="72" width="62" height="78" />
+    <rect x="96" y="68" width="62" height="5" fill="#e9e1d4" />
+    <!-- low wing -->
+    <rect x="46" y="104" width="24" height="46" />
+  </g>
+  <g fill="#8b7765" clip-path="url(#disc)">
+    <rect x="74" y="58" width="18" height="2" />
+    <g id="vwin"><rect x="76" y="64" width="3" height="80" /><rect x="81.5" y="64" width="3" height="80" /><rect x="87" y="64" width="3" height="80" /></g>
+    <g>
+      <rect x="101" y="80" width="5" height="9" /><rect x="111" y="80" width="5" height="9" /><rect x="121" y="80" width="5" height="9" /><rect x="131" y="80" width="5" height="9" /><rect x="141" y="80" width="5" height="9" /><rect x="151" y="80" width="5" height="9" />
+      <rect x="101" y="96" width="5" height="9" /><rect x="111" y="96" width="5" height="9" /><rect x="121" y="96" width="5" height="9" /><rect x="131" y="96" width="5" height="9" /><rect x="141" y="96" width="5" height="9" /><rect x="151" y="96" width="5" height="9" />
+      <rect x="101" y="112" width="5" height="9" /><rect x="111" y="112" width="5" height="9" /><rect x="121" y="112" width="5" height="9" /><rect x="131" y="112" width="5" height="9" /><rect x="141" y="112" width="5" height="9" /><rect x="151" y="112" width="5" height="9" />
+      <rect x="101" y="128" width="5" height="9" /><rect x="111" y="128" width="5" height="9" /><rect x="121" y="128" width="5" height="9" /><rect x="131" y="128" width="5" height="9" /><rect x="141" y="128" width="5" height="9" /><rect x="151" y="128" width="5" height="9" />
+    </g>
+    <rect x="50" y="112" width="4" height="7" /><rect x="58" y="112" width="4" height="7" /><rect x="50" y="126" width="4" height="7" /><rect x="58" y="126" width="4" height="7" />
+    <rect x="40" y="146" width="130" height="3" />
+  </g>
+  <circle cx="100" cy="100" r="62" fill="none" stroke="#7a6655" stroke-width="1" />
+</svg>

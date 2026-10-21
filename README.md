@@ -1,6 +1,6 @@
-# YTC Trip Registration
+# YTC Kerestir Trip Registration
 
-Passport-detail collection form for the Yeshiva Toras Chaim winter trip (departing Jan 17, 2027).
+Passport-detail collection form for the Kerestir trip from the Yeshiva Toras Chaim campaign (departing Jan 17, 2027).
 Collects legal name and contact info, then either a photo of the passport page **or** typed
 passport details (nationality, number, expiration), plus an optional El Al Matmid number. It warns anyone whose passport expires
 before **July 17, 2027** (six months after departure).
@@ -9,7 +9,8 @@ Built with Vite and plain JS. Data goes to Firebase (Firestore and Storage), and
 
 ## Logo
 
-Put the YTC seal at `public/logo.png` (a square PNG works best). Until you do, the header shows a simple placeholder (`public/logo.svg`).
+`public/logo.svg` is a vector redraw of the YTC seal. To use the original artwork instead, add it as
+`public/logo.png` and change `/logo.svg` to `/logo.png` in `index.html` and `admin.html`.
 
 ## Firebase setup
 

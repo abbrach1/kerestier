@@ -1,7 +1,4 @@
 import './style.css';
-import { collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable } from 'firebase/storage';
-import { db, storage } from './firebase.js';
 import { COMMON, COUNTRIES } from './countries.js';
 import { TRIP, MIN_EXPIRY } from './config.js';
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -123,6 +120,10 @@ form.addEventListener('submit', async (e) => {
   submitBtn.disabled = true;
   const label = submitBtn.textContent;
   try {
+    // Loaded on submit so the form itself always works, even if Firebase can't start.
+    const [{ collection, doc, setDoc, serverTimestamp }, { ref, uploadBytesResumable }, { db, storage }] = await Promise.all([
+      import('firebase/firestore'), import('firebase/storage'), import('./firebase.js'),
+    ]);
     const docRef = doc(collection(db, 'tripRegistrations'));
     const manual = method() === 'manual';
     let path = '';
