@@ -26,11 +26,11 @@ service cloud.firestore {
           && d.passportFilePath == '';
     }
 
-    // The public form can only create. Only admins can read; nobody can edit or
-    // delete from the browser.
+    // The public form can only create. Only admins can read or delete; nobody can
+    // edit from the browser.
     match /tripRegistrations/{id} {
-      allow read: if isAdmin();
-      allow update, delete: if false;
+      allow read, delete: if isAdmin();
+      allow update: if false;
       allow create: if validRegistration(request.resource.data, id);
     }
 

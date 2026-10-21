@@ -1,6 +1,6 @@
 import './style.css';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { ref, getDownloadURL } from 'firebase/storage';
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { app as firebaseApp, db, storage } from './firebase.js';
 import { MIN_EXPIRY } from './config.js';
@@ -124,9 +124,12 @@ $('rows').addEventListener('keydown', (e) => {
 
 const drawer = $('drawer');
 
+let openId = null;
+
 async function openDetails(id) {
   const r = rows.find((x) => x.id === id);
   if (!r) return;
+  openId = id;
   $('d-name').textContent = fullName(r);
 
   const fields = [
@@ -169,12 +172,56 @@ async function openDetails(id) {
 }
 
 function closeDetails() {
+  openId = null;
   drawer.hidden = true;
   document.body.style.overflow = '';
 }
 $('d-close').addEventListener('click', closeDetails);
 drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDetails(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.hidden) closeDetails(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !drawer.hidden && !confirmDlg.open) closeDetails();
+});
+
+// ---------- delete ----------
+
+const confirmDlg = $('confirm-delete');
+
+$('d-delete').addEventListener('click', () => {
+  const r = rows.find((x) => x.id === openId);
+  if (!r) return;
+  $('cd-body').textContent = `This permanently removes ${fullName(r)}'s details`
+    + (r.passportFilePath ? ' and passport photo' : '') + ". It can't be undone.";
+  $('cd-error').hidden = true;
+  $('cd-confirm').disabled = false;
+  $('cd-confirm').textContent = 'Delete';
+  confirmDlg.showModal();
+  $('cd-cancel').focus();
+});
+
+$('cd-confirm').addEventListener('click', async () => {
+  const r = rows.find((x) => x.id === openId);
+  if (!r) { confirmDlg.close(); return; }
+  const btn = $('cd-confirm');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  try {
+    // Photo first, so a registration is never left pointing at nothing.
+    if (r.passportFilePath) {
+      await deleteObject(ref(storage, r.passportFilePath)).catch((err) => {
+        if (err.code !== 'storage/object-not-found') throw err;
+      });
+    }
+    await deleteDoc(doc(db, 'tripRegistrations', r.id));
+    confirmDlg.close();
+    closeDetails();
+  } catch (err) {
+    console.error(err);
+    $('cd-error').textContent = "Couldn't delete it. Check your connection and try again.";
+    $('cd-error').hidden = false;
+    btn.disabled = false;
+    btn.textContent = 'Delete';
+  }
+});
 
 $('d-fields').addEventListener('click', async (e) => {
   const btn = e.target.closest('.copy');

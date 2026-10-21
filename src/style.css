@@ -241,3 +241,19 @@ button.copy:hover { background: var(--paper); }
   .who #who-email { display: none; }
   .details > div { grid-template-columns: 1fr; gap: 2px; }
 }
+
+.drawer__foot { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+button.danger-link { background: none; color: var(--error); padding: 0; min-height: 0; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+button.danger-link:hover { background: none; color: #7d2c1e; }
+button.danger { background: var(--error); }
+button.danger:hover { background: #7d2c1e; }
+
+dialog.confirm {
+  border: 1px solid var(--line); border-radius: 4px; padding: 24px 26px;
+  width: min(420px, calc(100% - 32px)); background: var(--card); color: var(--ink);
+}
+dialog.confirm::backdrop { background: rgba(47, 40, 34, .45); }
+dialog.confirm h2 { font-family: var(--serif); font-weight: 400; font-size: 22px; margin: 0 0 10px; }
+dialog.confirm p { margin: 0 0 18px; color: var(--muted); }
+.confirm__actions { display: flex; justify-content: flex-end; gap: 10px; }
+.confirm__actions button { min-height: 44px; padding: 10px 18px; }

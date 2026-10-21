@@ -83,8 +83,23 @@
         </div>
         <dl class="details" id="d-fields"></dl>
         <div class="d-passport" id="d-passport"></div>
+        <div class="drawer__foot">
+          <button type="button" class="danger-link" id="d-delete">Delete registration</button>
+        </div>
       </div>
     </aside>
+
+    <dialog class="confirm" id="confirm-delete" aria-labelledby="cd-title">
+      <form method="dialog">
+        <h2 id="cd-title">Delete this registration?</h2>
+        <p id="cd-body"></p>
+        <p class="form-error" id="cd-error" hidden></p>
+        <div class="confirm__actions">
+          <button type="submit" value="cancel" class="secondary" id="cd-cancel">Cancel</button>
+          <button type="button" class="danger" id="cd-confirm">Delete</button>
+        </div>
+      </form>
+    </dialog>
 
     <script type="module" src="/src/admin.js"></script>
   </body>
