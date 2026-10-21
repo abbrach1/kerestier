@@ -36,6 +36,11 @@ function checkExpiry() {
 }
 form.passportExpiry.addEventListener('change', checkExpiry);
 
+// Clear a field's error outline as soon as the traveler edits it.
+form.addEventListener('input', (e) => {
+  if (e.target.name !== 'passportExpiry') e.target.classList.remove('invalid');
+});
+
 function method() { return form.method.value; }
 for (const radio of form.method) {
   radio.addEventListener('change', () => {
@@ -65,6 +70,18 @@ form.passportFile.addEventListener('change', () => {
   }
 });
 
+// Date of birth as YYYY-MM-DD, or '' if it isn't a real past date.
+function birthDate() {
+  const m = form.bdayMonth.value;
+  const d = form.bdayDay.value.trim().padStart(2, '0');
+  const y = form.bdayYear.value.trim();
+  if (!m || !/^\d{2}$/.test(d) || !/^\d{4}$/.test(y)) return '';
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  if (date.getMonth() !== Number(m) - 1 || date.getDate() !== Number(d)) return '';
+  if (Number(y) < 1900 || date > new Date()) return '';
+  return `${y}-${m}-${d}`;
+}
+
 function fileInfo(file) {
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   const byExt = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', heic: 'image/heic', heif: 'image/heif', webp: 'image/webp', pdf: 'application/pdf' };
@@ -82,6 +99,9 @@ function validate() {
   for (const el of [f.firstName, f.lastName, f.email, f.phone]) mark(el, !el.value.trim());
   for (const el of [f.nationality, f.passportNumber, f.passportExpiry]) mark(el, manual && !el.value.trim());
   if (!f.firstName.value.trim() || !f.lastName.value.trim()) problems.push('your name as it appears on your passport');
+  const dobBad = !birthDate();
+  for (const el of [f.bdayMonth, f.bdayDay, f.bdayYear]) mark(el, dobBad);
+  if (dobBad) problems.push('a valid date of birth');
   if (!/^\S+@\S+\.\S+$/.test(f.email.value.trim())) { problems.push('a valid email'); mark(f.email, true); }
   if (f.phone.value.replace(/\D/g, '').length < 7) { problems.push('a phone number'); mark(f.phone, true); }
 
@@ -147,6 +167,7 @@ form.addEventListener('submit', async (e) => {
       firstName: form.firstName.value.trim(),
       middleName: form.middleName.value.trim(),
       lastName: form.lastName.value.trim(),
+      birthDate: birthDate(),
       email: form.email.value.trim().toLowerCase(),
       phone: form.phone.value.trim(),
       method: manual ? 'manual' : 'photo',

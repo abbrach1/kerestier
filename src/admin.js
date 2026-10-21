@@ -133,6 +133,7 @@ async function openDetails(id) {
     ['First name', r.firstName],
     ['Middle name', r.middleName],
     ['Last name', r.lastName],
+    ['Date of birth', r.birthDate ? fmtDate(r.birthDate) : ''],
     ['Email', r.email],
     ['Phone', r.phone],
     ['Nationality', r.nationality],
@@ -189,6 +190,7 @@ $('d-fields').addEventListener('click', async (e) => {
 $('export').addEventListener('click', () => {
   const cols = [
     ['First name', 'firstName'], ['Middle name', 'middleName'], ['Last name', 'lastName'],
+    ['Date of birth', 'birthDate'],
     ['Email', 'email'], ['Phone', 'phone'], ['Nationality', 'nationality'],
     ['Passport #', 'passportNumber'], ['Passport expiry', 'passportExpiry'],
     ['El Al Matmid #', 'matmidNumber'], ['Sent as', 'method'],
