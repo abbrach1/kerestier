@@ -9,8 +9,7 @@ Built with Vite and plain JS. Data goes to Firebase (Firestore and Storage), and
 
 ## Logo
 
-`public/logo.svg` is a vector redraw of the YTC seal. To use the original artwork instead, add it as
-`public/logo.png` and change `/logo.svg` to `/logo.png` in `index.html` and `admin.html`.
+The YTC seal is `public/logo.png`. Replace that file to change it everywhere.
 
 ## Firebase setup
 

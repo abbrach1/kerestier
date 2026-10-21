@@ -118,9 +118,9 @@ async function openDetails(id) {
   $('d-name').textContent = fullName(r);
 
   const fields = [
-    ['Given name(s)', r.firstName],
+    ['First name', r.firstName],
     ['Middle name', r.middleName],
-    ['Surname', r.lastName],
+    ['Last name', r.lastName],
     ['Email', r.email],
     ['Phone', r.phone],
     ['Nationality', r.nationality],
@@ -176,7 +176,7 @@ $('d-fields').addEventListener('click', async (e) => {
 
 $('export').addEventListener('click', () => {
   const cols = [
-    ['Given name(s)', 'firstName'], ['Middle name', 'middleName'], ['Surname', 'lastName'],
+    ['First name', 'firstName'], ['Middle name', 'middleName'], ['Last name', 'lastName'],
     ['Email', 'email'], ['Phone', 'phone'], ['Nationality', 'nationality'],
     ['Passport #', 'passportNumber'], ['Passport expiry', 'passportExpiry'],
     ['El Al Matmid #', 'matmidNumber'], ['Sent as', 'method'],
