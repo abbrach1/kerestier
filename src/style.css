@@ -174,7 +174,15 @@ button:disabled { opacity: .6; cursor: wait; }
 
 .footer { padding-top: 32px; padding-bottom: 32px; font-size: 13px; color: var(--muted); }
 .footer p { margin: 0 0 6px; }
-.contact { font-size: 15px; color: var(--ink); margin-bottom: 10px; padding-top: 18px; border-top: 1px solid var(--line); }
+.contact { font-size: 15px; color: var(--ink); margin-bottom: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+.contact p { margin: 0 0 10px; }
+.wa {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px;
+  border: 1px solid #cfc4b4; border-radius: 3px; background: var(--card);
+  color: var(--ink); font-weight: 500; text-decoration: none;
+}
+.wa svg { color: #1f8f4e; flex: none; }
+.wa:hover { border-color: var(--brand); background: #fff; }
 .credit { font-size: 12px; opacity: .8; }
 .credit a { color: inherit; }
 
